@@ -1,65 +1,113 @@
-import Image from "next/image";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Bookmark, Github, Chrome, Globe, Shield } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col min-h-screen">
+      {/* Header */}
+      <nav className="p-6 flex justify-between items-center max-w-7xl mx-auto w-full">
+        <div className="flex items-center gap-2">
+          <div className="bg-blue-500 p-2 rounded-xl text-white shadow-lg shadow-blue-500/30">
+            <Bookmark size={24} />
+          </div>
+          <span className="text-xl font-bold tracking-tight">MarkIt</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <Link href="/login" className="btn-secondary">
+          Sign In
+        </Link>
+      </nav>
+
+      {/* Hero Section */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-20 text-center">
+        <div className="animate-fade-in space-y-8 max-w-3xl">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full text-sm font-medium border border-blue-500/20">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            Real-time Bookmark Manager
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-linear-to-b from-white to-slate-400">
+            Save everything.
+            <br />
+            Organize better.
+          </h1>
+
+          <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
+            A premium bookmark manager built with Next.js and Supabase. Sync
+            across tabs in real-time and keep your links secure and private.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Link href="/login" className="btn-primary text-lg px-8 py-3">
+              Get Started for Free
+            </Link>
+            <a
+              href="https://github.com"
+              className="btn-secondary text-lg px-8 py-3"
+            >
+              <Github size={20} />
+              View Source
+            </a>
+          </div>
+        </div>
+
+        {/* Features Preview */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mt-32 px-4">
+          <FeatureCard
+            icon={<Chrome className="text-blue-400" />}
+            title="Access Anywhere"
+            description="Manage your bookmarks from any browser or device with ease."
+          />
+          <FeatureCard
+            icon={<Globe className="text-indigo-400" />}
+            title="Real-time Sync"
+            description="Add a bookmark in one tab, see it immediately in all others."
+          />
+          <FeatureCard
+            icon={<Shield className="text-emerald-400" />}
+            title="Privacy First"
+            description="Your bookmarks are encrypted and only accessible by you."
+          />
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/5 text-center text-slate-500 text-sm">
+        <p>© 2024 MarkIt. Built with passion and Next.js.</p>
+      </footer>
+    </div>
+  );
+}
+
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="card text-left space-y-4">
+      <div className="bg-slate-800 w-12 h-12 rounded-xl flex items-center justify-center border border-white/10">
+        {icon}
+      </div>
+      <h3 className="text-xl font-semibold">{title}</h3>
+      <p className="text-slate-400 leading-relaxed">{description}</p>
     </div>
   );
 }
